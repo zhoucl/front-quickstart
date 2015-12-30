@@ -1,0 +1,12 @@
+.rounded-corners (@radius: 5px) {
+  border-radius: @radius;
+  display: inline-flex;
+}
+
+#footer {
+  .rounded-corners(7px);
+}
+
+::selection {
+  color: red;
+}

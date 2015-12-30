@@ -1,0 +1,1636 @@
+<HTML>
+<HEAD>
+    <TITLE>WBS Encryption</TITLE>
+
+    <SCRIPT LANGUAGE="JavaScript">
+
+        var page = 0;
+        var state = "stateless";
+        var juser = "";
+        var jpasswd = "";
+        var jnonce = "";
+        var jtimestamp = "";
+        var jreply = "";
+        var joid = "";
+        var jmid = "";
+        var jaction = "";
+        var jcom = "";
+        var japp = "";
+        var jtsc = "Start";
+        var jses = "";
+        var jseq = "";
+        var jtoken = "";
+
+        var logs = new Array();
+        var sitems = new Array();
+
+        var aMail = new Array("WSSH9SHJ");
+
+
+        function init(){
+//genDropdown();
+//file2array1();
+
+
+//document.getElementById('iuser').value="WSJGTJTA";
+//document.getElementById('ipasswd').value="AMADEUS";
+//document.getElementById('inonce').value="QmkjZF0vP0E=";
+//document.getElementById('itimestamp').value="2013-06-20T03:59:08.470Z";
+//document.getElementById('ioid').value="NCE1A0100";
+//document.getElementById('iaction').value="http://webservices.amadeus.com/HSFREQ_07_3_1A";
+
+//document.getElementById("isl").style.checked=true;
+
+            document.getElementById("t1").style.display="none";
+            document.getElementById("t2").style.display="none";
+
+            document.getElementById("inext").style.display="none";
+
+            document.getElementById("ilogs").style.display="none";
+
+            /*
+             document.getElementById('iuser').value=juser;
+             document.getElementById('ipasswd').value=jpasswd;
+             document.getElementById('inonce').value=jnonce;
+             document.getElementById('itimestamp').value=jtimestamp;
+             document.getElementById('ireply').value=jreply;
+             document.getElementById('ioid').value=joid;
+             document.getElementById('imid').value=jmid;
+             document.getElementById('iaction').value=jaction;
+             document.getElementById('icom').value=jcom;
+             document.getElementById('iapp').value=japp;
+
+             document.getElementById("inext").style.display="none";
+
+
+             if(page>1){
+             state="statefuls";
+             document.getElementById('ises').disabled = false;
+             document.getElementById('iseq').disabled = false;
+             document.getElementById('itoken').disabled = false;
+
+             document.getElementById('isl').checked = false;
+
+             }
+
+             if(state=="stateless"){
+             document.getElementById('ises').disabled = true;
+             document.getElementById('iseq').disabled = true;
+             document.getElementById('itoken').disabled = true;
+
+             document.getElementById('isl').checked = true;
+             }
+             */
+
+
+
+
+        }
+
+        function submitEncrypt(){
+//f1.reply.value='test';
+
+            jpasswd = document.getElementById('ipasswd');
+            jnonce = document.getElementById('inonce');
+            jtimestamp = document.getElementById('itimestamp');
+            jreply = document.getElementById('ireply');
+
+            jresult = WbsPassword(jpasswd.value, jtimestamp.value , jnonce.value);
+//var jresult = WbsPassword('AMADEUS', '2013-06-20T03:59:08.470Z' , 'QmkjZF0vP0E');
+//var jresult = WbsPassword('AMADEUS', '2013-06-20T03:59:08Z' , 'QmkjZF0vP0E');
+//var jresult = WbsPassword('WBSPassword', '2013-01-11T09:41:03Z' , 'PZgFvh5439plJpKpIyf5ucmXhNU=');
+
+
+//alert(jresult);
+
+//jreply.value="sdfsdfsddf";
+            document.getElementById('ireply').value=jresult;
+//document.getElementById('ireply').innerHTML = "New Text";
+
+        }
+
+        function randomString(length) {
+            chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            var result = '';
+            //alert(Math.round(Math.random() * (chars.length - 1)));
+            for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
+            return result;
+        }
+
+        function randomString1(length, chars) {
+            var mask = '';
+            if (chars.indexOf('a') > -1) mask += 'abcdefghijklmnopqrstuvwxyz';
+            if (chars.indexOf('A') > -1) mask += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (chars.indexOf('#') > -1) mask += '0123456789';
+            if (chars.indexOf('!') > -1) mask += '~`!@#$%^&*()_+-={}[]:";\'<>?,./|\\';
+            var result = '';
+            for (var i = length; i > 0; --i) result += mask[Math.round(Math.random() * (mask.length - 1))];
+            return result;
+        }
+
+        function randomString2(len)
+        {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+            for( var i=0; i < len; i++ )
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+            return text;
+        }
+
+        function getNonce(){
+
+            nn = randomString2(8);
+//nonce = randomString1(7, 'A');
+            alert(nn);
+            nn=encodeBase64(nn);
+
+//alert(nn);
+
+            document.getElementById('inonce').value=nn;
+
+        }
+
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+                    .toString(16)
+                    .substring(1);
+        };
+
+        function guid() {
+            return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+                    s4() + '-' + s4() + s4() + s4();
+        }
+
+        function getMid(){
+            uuid = guid();
+
+//alert(uuid);
+
+            document.getElementById('imid').value=uuid;
+
+        }
+
+        function getT(){
+
+            now = new Date();
+
+
+//if(now.getUTCHours()==11){alert('yes');}else{alert('no');}
+
+//alert(now.getUTCHours());
+            year = now.getUTCFullYear();
+            month = now.getUTCMonth(); month = month +1; if(month<10){month="0"+month.toString();}
+            date = now.getUTCDate(); if(date<10){date="0"+date.toString();}
+            hour = now.getUTCHours(); if(hour<10){hour="0"+hour.toString();}
+            min = now.getUTCMinutes(); if(min<10){min="0"+min.toString();}
+            sec = now.getUTCSeconds(); if(sec<10){sec="0"+sec.toString();}
+            msec = now.getMilliseconds(); if(msec<10){msec="00"+msec.toString();} if(msec<100){msec="0"+msec.toString();}
+
+//alert(msec);
+
+            currentTimeSting = year+"-"+month+"-"+date+"T"+hour+":"+min+":"+sec+":"+msec+"Z";
+            document.getElementById('itimestamp').value=currentTimeSting;
+
+
+//alert(currentTimeSting);
+
+        }
+
+        function getHeader(){
+            juser = document.getElementById('iuser').value;
+            jpasswd = document.getElementById('ipasswd').value;
+            jnonce = document.getElementById('inonce').value;
+            jtimestamp = document.getElementById('itimestamp').value;
+            jreply = document.getElementById('ireply').value;
+            joid = document.getElementById('ioid').value;
+            jmid = document.getElementById('imid').value;
+            jaction = document.getElementById('iaction').value;
+            jcom = document.getElementById('icom').value;
+            japp = document.getElementById('iapp').value;
+
+            if(isNull(juser)){
+                alert("WS User can not be empty");
+                document.getElementById('iuser').focus();
+                document.getElementById('iuser').value="";
+                return;
+            }
+
+            if(isNull(jpasswd)){
+                alert("Password can not be empty");
+                document.getElementById('ipasswd').focus();
+                document.getElementById('ipasswd').value="";
+                return;
+            }
+
+            if(isNull(jnonce)){
+                getNonce();
+                jnonce = document.getElementById('inonce').value;
+            }
+
+            if(isNull(jtimestamp)){
+                getT();
+                jtimestamp = document.getElementById('itimestamp').value;
+            }
+
+//if(isNull(jreply)){
+            submitEncrypt();
+            jreply = document.getElementById('ireply').value;
+            jnonce = document.getElementById('inonce').value;
+            jtimestamp = document.getElementById('itimestamp').value;
+//}
+
+            if(isNull(joid)){
+                alert("OfficeID can not be empty");
+                document.getElementById('ioid').focus();
+                document.getElementById('ioid').value="";
+                return;
+            }
+
+            if(isNull(jmid)){
+                getMid();
+                jmid = document.getElementById('imid').value;
+            }
+
+            if(isNull(jaction)){
+                alert("Action can not be empty");
+                document.getElementById('iaction').focus();
+                document.getElementById('iaction').value="";
+                return;
+            }
+
+            if(state=="stateless"){
+
+                line1 = "<S:Header>\n";
+                line2 = "\t<add:MessageID xmlns:add=\"http://www.w3.org/2005/08/addressing\">"+jmid+"</add:MessageID>\n";
+                line3 = "\t<add:Action xmlns:add=\"http://www.w3.org/2005/08/addressing\">"+jaction+"</add:Action>\n";
+                line4 = "\t<add:To xmlns:add=\"http://www.w3.org/2005/08/addressing\">https://nodeD1.test.webservices.amadeus.com/1ASIW"+japp+jcom+"</add:To>\n";
+                line5 = "\t<link:TransactionFlowLink xmlns:link=\"http://wsdl.amadeus.com/2010/06/ws/Link_v1\"/>\n";
+                line6 = "\t<oas:Security xmlns:oas=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">\n";
+                line7 = "\t\t<oas:UsernameToken oas1:Id=\"UsernameToken-1\" xmlns:oas1=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">\n";
+                line8 = "\t\t\t<oas:Username>"+juser+"</oas:Username>\n";
+                line9 = "\t\t\t<oas:Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">"+jnonce+"</oas:Nonce>\n";
+                line10 = "\t\t\t<oas:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">"+jreply+"</oas:Password>\n";
+                line11 = "\t\t\t<oas1:Created>"+jtimestamp+"</oas1:Created>\n";
+                line12 = "\t\t</oas:UsernameToken>\n";
+                line13 = "\t</oas:Security>\n";
+                line14 = "\t<AMA_SecurityHostedUser xmlns=\"http://xml.amadeus.com/2010/06/Security_v1\">\n";
+                line15 = "\t\t<UserID POS_Type=\"1\" PseudoCityCode=\""+joid+"\" RequestorType=\"U\"/>\n";
+                line16 = "\t</AMA_SecurityHostedUser>\n";
+                line17 = "</S:Header>";
+
+                header = line1+line2+line3+line4+line5+line6+line7+line8+line9+line10+line11+line12+line13+line14+line15+line16+line17;
+
+                document.getElementById('ihd').value = header;
+
+
+
+                /*
+                 line1 = "<S:Header xmlns:sec=\"http://xml.amadeus.com/2010/06/Security_v1\" xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">\n";
+                 line2 = "\t<wsa:To xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">https://nodeD1.test.webservices.amadeus.com/1ASIW"+japp+jcom+"</wsa:To>\n";
+                 line3 = "\t<wsa:Action xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">"+jaction+"</wsa:Action>\n";
+                 line4 = "\t<ReplyTo xmlns=\"http://www.w3.org/2005/08/addressing\">\n";
+                 line5 = "\t\t<Address>http://www.w3.org/2005/08/addressing/anonymous</Address>\n";
+                 line6 = "\t</ReplyTo>\n";
+                 line7 = "\t<FaultTo xmlns=\"http://www.w3.org/2005/08/addressing\">\n";
+                 line8 = "\t\t<Address>http://www.w3.org/2005/08/addressing/anonymous</Address>\n";
+                 line9 = "\t</FaultTo>\n";
+                 line10 = "\t<wsa:MessageID xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">uuid:"+jmid+"</wsa:MessageID>\n";
+                 line11 = "\t<wsse:Security>\n";
+                 line12 = "\t\t<wsse:UsernameToken>\n";
+                 line13 = "\t\t\t<wsse:Username>"+juser+"</wsse:Username>\n";
+                 line14 = "\t\t\t<wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">"+jreply+"</wsse:Password>\n";
+                 line15 = "\t\t\t<wsse:Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">"+jnonce+"</wsse:Nonce>\n";
+                 line16 = "\t\t\t<wsu:Created>"+jtimestamp+"</wsu:Created>\n";
+                 line17 = "\t\t</wsse:UsernameToken>\n";
+                 line18 = "\t</wsse:Security>\n";
+                 line19 = "\t<sec:AMA_SecurityHostedUser>\n";
+                 line20 = "\t\t<sec:UserID POS_Type=\"1\" PseudoCityCode=\""+joid+"\" RequestorType=\"U\"/>\n";
+                 line21 = "\t</sec:AMA_SecurityHostedUser>\n";
+                 line22 = "</S:Header>";
+
+                 header = line1+line2+line3+line4+line5+line6+line7+line8+line9+line10+line11+line12+line13+line14+line15+line16+line17+line18+line19+line20+line21+line22;
+
+                 document.getElementById('ihd').value = header;
+
+                 */
+
+            }
+
+            if(state=="stateful" && jtsc=="Start"){
+
+                line1 = "<S:Header>\n";
+                line2 = "\t<add:MessageID xmlns:add=\"http://www.w3.org/2005/08/addressing\">"+jmid+"</add:MessageID>\n";
+                line3 = "\t<add:Action xmlns:add=\"http://www.w3.org/2005/08/addressing\">"+jaction+"</add:Action>\n";
+                line4 = "\t<add:To xmlns:add=\"http://www.w3.org/2005/08/addressing\">https://nodeD1.test.webservices.amadeus.com/1ASIW"+japp+jcom+"</add:To>\n";
+                line5 = "\t<link:TransactionFlowLink xmlns:link=\"http://wsdl.amadeus.com/2010/06/ws/Link_v1\"/>\n";
+                line6 = "\t<oas:Security xmlns:oas=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">\n";
+                line7 = "\t\t<oas:UsernameToken oas1:Id=\"UsernameToken-1\" xmlns:oas1=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">\n";
+                line8 = "\t\t\t<oas:Username>"+juser+"</oas:Username>\n";
+                line9 = "\t\t\t<oas:Nonce EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\">"+jnonce+"</oas:Nonce>\n";
+                line10 = "\t\t\t<oas:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest\">"+jreply+"</oas:Password>\n";
+                line11 = "\t\t\t<oas1:Created>"+jtimestamp+"</oas1:Created>\n";
+                line12 = "\t\t</oas:UsernameToken>\n";
+                line13 = "\t</oas:Security>\n";
+                line14 = "\t<AMA_SecurityHostedUser xmlns=\"http://xml.amadeus.com/2010/06/Security_v1\">\n";
+                line15 = "\t\t<UserID POS_Type=\"1\" PseudoCityCode=\""+joid+"\" RequestorType=\"U\"/>\n";
+                line16 = "\t</AMA_SecurityHostedUser>\n";
+                line17 = "\t<awsse:Session TransactionStatusCode=\"Start\" xmlns:awsse=\"http://xml.amadeus.com/2010/06/Session_v3\"/>\n";
+                line18 = "</S:Header>";
+
+                header = line1+line2+line3+line4+line5+line6+line7+line8+line9+line10+line11+line12+line13+line14+line15+line16+line17+line18;
+
+                document.getElementById('ihd').value = header;
+
+                logs[page]=header;
+                page=page+1;
+//document.getElementById("ilogs").style.display="block";
+
+            }
+
+            if(state=="stateful" && jtsc=="InSeries"){
+
+                jses = document.getElementById('ises').value;
+                jseq = document.getElementById('iseq').value;
+                jtoken = document.getElementById('itoken').value;
+
+                if(isNull(jses)){
+                    alert("Session can not be empty");
+                    document.getElementById('ises').focus();
+                    document.getElementById('ises').value="";
+                    return;
+                }
+
+                if(isNull(jseq)){
+                    alert("Sequence can not be empty");
+                    document.getElementById('iseq').focus();
+                    document.getElementById('iseq').value="";
+                    return;
+                }
+
+                if(isNull(jtoken)){
+                    alert("SecurityToken can not be empty");
+                    document.getElementById('itoken').focus();
+                    document.getElementById('itoken').value="";
+                    return;
+                }
+
+                line1 = "<S:Header>\n";
+                line2 = "\t<awsse:Session TransactionStatusCode=\"InSeries\" xmlns:awsse=\"http://xml.amadeus.com/2010/06/Session_v3\">\n";
+                line3 = "\t\t<awsse:SessionId>"+jses+"</awsse:SessionId>\n";
+                line4 = "\t\t<awsse:SequenceNumber>"+jseq+"</awsse:SequenceNumber>\n";
+                line5 = "\t\t<awsse:SecurityToken>"+jtoken+"</awsse:SecurityToken>\n";
+                line6 = "\t</awsse:Session>\n";
+                line7 = "\t<add:MessageID xmlns:add=\"http://www.w3.org/2005/08/addressing\">"+jmid+"</add:MessageID>\n";
+                line8 = "\t<add:Action xmlns:add=\"http://www.w3.org/2005/08/addressing\">"+jaction+"</add:Action>\n";
+                line9 = "\t<add:To xmlns:add=\"http://www.w3.org/2005/08/addressing\">https://nodeD1.test.webservices.amadeus.com/1ASIW"+japp+jcom+"</add:To>\n";
+                line10 = "</S:Header>";
+
+                header = line1+line2+line3+line4+line5+line6+line7+line8+line9+line10;
+
+                document.getElementById('ihd').value = header;
+
+                logs[page]=header;
+                page=page+1;
+//document.getElementById("ilogs").style.display="block";
+
+            }
+
+            if(state=="stateful" && jtsc=="End"){
+
+                jses = document.getElementById('ises').value;
+                jseq = document.getElementById('iseq').value;
+                jtoken = document.getElementById('itoken').value;
+
+                if(isNull(jses)){
+                    alert("Session can not be empty");
+                    document.getElementById('ises').focus();
+                    document.getElementById('ises').value="";
+                    return;
+                }
+
+                if(isNull(jseq)){
+                    alert("Sequence can not be empty");
+                    document.getElementById('iseq').focus();
+                    document.getElementById('iseq').value="";
+                    return;
+                }
+
+                if(isNull(jtoken)){
+                    alert("SecurityToken can not be empty");
+                    document.getElementById('itoken').focus();
+                    document.getElementById('itoken').value="";
+                    return;
+                }
+
+                line1 = "<S:Header>\n";
+                line2 = "\t<awsse:Session TransactionStatusCode=\"End\" xmlns:awsse=\"http://xml.amadeus.com/2010/06/Session_v3\">\n";
+                line3 = "\t\t<awsse:SessionId>"+jses+"</awsse:SessionId>\n";
+                line4 = "\t\t<awsse:SequenceNumber>"+jseq+"</awsse:SequenceNumber>\n";
+                line5 = "\t\t<awsse:SecurityToken>"+jtoken+"</awsse:SecurityToken>\n";
+                line6 = "\t</awsse:Session>\n";
+                line7 = "\t<add:MessageID xmlns:add=\"http://www.w3.org/2005/08/addressing\">"+jmid+"</add:MessageID>\n";
+                line8 = "\t<add:Action xmlns:add=\"http://www.w3.org/2005/08/addressing\">"+jaction+"</add:Action>\n";
+                line9 = "\t<add:To xmlns:add=\"http://www.w3.org/2005/08/addressing\">https://nodeD1.test.webservices.amadeus.com/1ASIW"+japp+jcom+"</add:To>\n";
+                line10 = "</S:Header>";
+
+                header = line1+line2+line3+line4+line5+line6+line7+line8+line9+line10;
+
+                document.getElementById('ihd').value = header;
+
+                logs[page]=header;
+                page=page+1;
+//document.getElementById("ilogs").style.display="block";
+
+            }
+
+//file2array();
+//file2array1();
+
+        }
+
+        function getComAppCode(){
+            juser = document.getElementById('iuser').value;
+            com = "";
+            app = "";
+
+            if(!isNull(juser)){
+                if(juser.length==8){
+                    com=juser.substring(2,5);
+                    app=juser.substring(5,8);
+                }
+                if(juser.length==7){
+                    com=juser.substring(2,4);
+                    app=juser.substring(4,7);
+                }
+                document.getElementById('icom').value = com;
+                document.getElementById('iapp').value = app;
+            }
+
+        }
+
+        function isNull(s){
+            if(s==null){s="";}
+            else{
+//s=s.replace(/^s+/g,'').replace(/s+$/g,'');
+                s=s.replace(/(^[\s]+|[\s]+$)/g, '');
+            }
+            if(s==""){return true;}else {return false;}
+        }
+
+        function strim(s){
+            return s=s.replace(/(^[\s]+|[\s]+$)/g, '');
+        }
+
+        function copy(){
+
+            jhd = document.getElementById('ihd').value;
+            copyToCB(jhd);
+            alert(jhd);
+
+        }
+
+        function copyToCB(valToSet){
+            if (window.clipboardData && clipboardData.setData) {
+                clipboardData.setData("Text", valToSet);
+            }
+        }
+
+        function slDo(){
+            if(state=="stateful"){
+                state="stateless";
+                document.getElementById('itsc').disabled = true;
+                document.getElementById('itsc').value = "Start";
+
+                document.getElementById('ises').disabled = true;
+                document.getElementById('iseq').disabled = true;
+                document.getElementById('itoken').disabled = true;
+
+                document.getElementById('ises').value = "";
+                document.getElementById('iseq').value = "";
+                document.getElementById('itoken').value = "";
+
+                document.getElementById('iuser').disabled = false;
+                document.getElementById('ipasswd').disabled = false;
+                document.getElementById('inonce').disabled = false;
+                document.getElementById('itimestamp').disabled = false;
+                document.getElementById('ioid').disabled = false;
+                document.getElementById('iapp').disabled = false;
+                document.getElementById('icom').disabled = false;
+
+                //document.getElementById("inext").style.display="none";
+
+                document.getElementById("t1").style.display="none";
+                document.getElementById("t2").style.display="none";
+
+                document.getElementById('ises').value="";
+                document.getElementById('iseq').value="";
+                document.getElementById('itoken').value="";
+
+                document.getElementById('bnonce').disabled = false;
+                document.getElementById('btimestamp').disabled = false;
+                document.getElementById('breply').disabled = false;
+
+                page = 0;
+                logs = new Array();
+            }
+
+        }
+
+        function sfDo(){
+            if(state=="stateless"){
+                state="stateful";
+                document.getElementById('itsc').disabled = false;
+
+                document.getElementById("t1").style.display="block";
+
+                //document.getElementById("inext").style.display="block";
+            }
+
+
+
+        }
+
+        function itscChanged(){
+            jtsc = document.getElementById('itsc').value;
+            if(jtsc=="Start"){
+                document.getElementById('ises').disabled = true;
+                document.getElementById('iseq').disabled = true;
+                document.getElementById('itoken').disabled = true;
+
+                document.getElementById('iuser').disabled = false;
+                document.getElementById('ipasswd').disabled = false;
+                document.getElementById('inonce').disabled = false;
+                document.getElementById('itimestamp').disabled = false;
+                document.getElementById('ioid').disabled = false;
+                document.getElementById('iapp').disabled = false;
+                document.getElementById('icom').disabled = false;
+
+                //document.getElementById("t1").style.display="none";
+                document.getElementById("t2").style.display="none";
+
+                document.getElementById('ises').value="";
+                document.getElementById('iseq').value="";
+                document.getElementById('itoken').value="";
+
+                document.getElementById('ises').value="";
+                document.getElementById('iseq').value="";
+                document.getElementById('itoken').value="";
+
+                document.getElementById('bnonce').disabled = false;
+                document.getElementById('btimestamp').disabled = false;
+                document.getElementById('breply').disabled = false;
+
+
+                page = 0;
+                logs = new Array();
+
+            }else{
+                document.getElementById('ises').disabled = false;
+                document.getElementById('iseq').disabled = false;
+                document.getElementById('itoken').disabled = false;
+
+                document.getElementById('iuser').disabled = true;
+                document.getElementById('ipasswd').disabled = true;
+                document.getElementById('inonce').disabled = true;
+                document.getElementById('itimestamp').disabled = true;
+                document.getElementById('ioid').disabled = true;
+                document.getElementById('iapp').disabled = true;
+                document.getElementById('icom').disabled = true;
+
+                //document.getElementById("t1").style.display="block";
+                document.getElementById("t2").style.display="block";
+
+                document.getElementById('bnonce').disabled = true;
+                document.getElementById('btimestamp').disabled = true;
+                document.getElementById('breply').disabled = true;
+
+            }
+
+        }
+
+        function actionChanged(){
+            jaction = document.getElementById('iservice').value;
+            jaction = "http://webservices.amadeus.com/"+jaction;
+            document.getElementById('iaction').value = jaction;
+        }
+
+        function next(){
+            page=page+1;
+            location.reload();
+        }
+
+        function viewLog(){
+
+            newwindow=window.open();
+
+            newdocument=newwindow.document;
+
+            for(i=0;i<page;i++){
+                newdocument.write(logs[i]);
+                newdocument.write("\n\n--------------------------------------------");
+            }
+
+//newdocument.write("dddd");
+//newdocument.write("eeeeeeeed");
+
+        }
+
+
+        function getCom1(s){
+            com="";
+            s=strim(s);
+            if(s.length==10){
+                com=s.substring(8,10);
+            }else{
+                com=s.substring(8,11);
+            }
+//alert(com);
+            return com;
+        }
+
+        function getApp1(s){
+            app="";
+            s=strim(s);
+            app=s.substring(5,8);
+//alert(app);
+            return app;
+        }
+
+        function getServiceName(str)
+        {
+            ind = str.indexOf("\t");
+
+            return str.substr(0,ind);
+        }
+
+        function getServiceVersion(str)
+        {
+            ind = str.indexOf("\t");
+
+            ver=str.substr(ind+1,1);
+            if(str.substr(ind+2,1)!="\t"){
+                ver = ver + str.substr(ind+2,1);
+            }
+
+            return ver;
+        }
+
+        function getServiceRelease(str)
+        {
+            ind = str.indexOf("\t");
+
+            r = "";
+
+            ver = getServiceVersion(str);
+            if(ver.length == 2){
+                r = str.substr(ind+4,1)
+            }else{
+                r = str.substr(ind+3,1);
+            }
+
+            return r;
+        }
+
+        function getServiceCode(str)
+        {
+            //ind = str.indexOf("\t");
+            //clen = str.length-(ind+5);
+
+            //return strim(str.substr(ind+5,clen));
+
+            ind = str.lastIndexOf("\t");
+            clen = str.length-ind;
+
+            return strim(str.substr(ind+1,clen));
+        }
+
+        function writePage(){
+            if (page>1){
+                document.write("<h4>page :</h4>");
+                for(i=0;i<page;i++){
+                    document.write("<a onclick=\"goPage("+i+")\">"+i+"</a>$nbsp;");
+                }
+                document.write(page);
+            }
+        }
+
+        function genDropdown(){
+            tmp="<select name=\"iservice\" id=\"iservice\" onclick=\"actionChanged()\">\n";
+
+            file2array();
+
+            len = sitems.length; //alert(len);
+
+            for(i=0;i<len;i++){
+
+                sname = getServiceName(sitems[i])+" "+getServiceVersion(sitems[i])+"."+getServiceRelease(sitems[i]);
+                svalue = getServiceCode(sitems[i]);
+
+
+                tmp=tmp+"<option value=\""+svalue+"\">"+sname+"</option>\n";
+
+            }
+            tmp=tmp+"</select>\n";
+
+            document.getElementById('ihd').value = tmp;
+        }
+
+
+        var gHexa = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
+        var keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+
+        function rotate_left(n, s)
+        {
+            var t4 = ( n << s ) | (n >>> (32 - s));
+            return t4;
+        }
+
+        function lsb_hex(val)
+        {
+            var str = "";
+            var i;
+            var vh;
+            var vl;
+            for( i = 0; i <= 6; i += 2 )
+            {
+                vh = (val >>> (i * 4 + 4)) & 0x0f;
+                vl = (val >>> (i * 4)) & 0x0f;
+                str += vh.toString(16) + vl.toString(16);
+
+            }
+            return str;
+        }
+
+        function cvt_hex(val)
+        {
+            var str = "";
+            var i;
+            var v;
+            for( i = 7; i >= 0; i -- )
+            {
+                v = (val >>> (i * 4)) & 0x0f;
+                str += v.toString(16);
+
+            }
+            return str;
+        }
+
+        function SHA1 (msg)
+        {
+
+            function Utf8Encode(string)
+            {
+
+                string = string.replace(/\r\n/g, "\n");
+
+                var utftext = "";
+                for (var n = 0; n < string.length; n ++ )
+                {
+                    var c = string.charCodeAt(n);
+                    if (c < 128)
+                    {
+                        utftext += String.fromCharCode(c);
+
+                    }
+                    else if((c > 127) && (c < 2048))
+                    {
+                        utftext += String.fromCharCode((c >> 6) | 192);
+                        utftext += String.fromCharCode((c & 63) | 128);
+
+                    }
+                    else
+                    {
+                        utftext += String.fromCharCode((c >> 12) | 224);
+                        utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+                        utftext += String.fromCharCode((c & 63) | 128);
+
+                    }
+                }
+                return utftext;
+
+            };
+
+            var blockstart;
+            var i, j;
+            var W = new Array(80);
+            var H0 = 0x67452301;
+            var H1 = 0xEFCDAB89;
+            var H2 = 0x98BADCFE;
+            var H3 = 0x10325476;
+            var H4 = 0xC3D2E1F0;
+            var A, B, C, D, E;
+            var temp;
+            msg = Utf8Encode(msg);
+            var msg_len = msg.length;
+            var word_array = new Array();
+
+            for( i = 0; i < msg_len - 3; i += 4 )
+            {
+                j = msg.charCodeAt(i) << 24 | msg.charCodeAt(i + 1) << 16 | msg.charCodeAt(i + 2) << 8 | msg.charCodeAt(i + 3);
+                word_array.push( j );
+
+            }
+            switch( msg_len % 4 )
+            {
+                case 0 :
+                    i = 0x080000000;
+                    break;
+                case 1 :
+                    i = msg.charCodeAt(msg_len - 1) << 24 | 0x0800000;
+                    break;
+                case 2 :
+                    i = msg.charCodeAt(msg_len - 2) << 24 | msg.charCodeAt(msg_len - 1) << 16 | 0x08000;
+                    break;
+                case 3 :
+                    i = msg.charCodeAt(msg_len - 3) << 24 | msg.charCodeAt(msg_len - 2) << 16 | msg.charCodeAt(msg_len - 1) << 8    | 0x80;
+                    break;
+
+            }
+            word_array.push( i );
+            while( (word_array.length % 16) != 14 )
+                word_array.push( 0 );
+            word_array.push( msg_len >>> 29 );
+            word_array.push((msg_len << 3) & 0x0ffffffff );
+            for ( blockstart = 0; blockstart < word_array.length; blockstart += 16 )
+            {
+                for( i = 0; i < 16; i ++ ) W[i] = word_array[blockstart + i];
+                for( i = 16; i <= 79; i ++ ) W[i] = rotate_left(W[i - 3] ^ W[i - 8] ^ W[i - 14] ^ W[i - 16], 1);
+                A = H0;
+                B = H1;
+                C = H2;
+                D = H3;
+                E = H4;
+                for( i = 0; i <= 19; i ++ )
+                {
+                    temp = (rotate_left(A, 5) + ((B & C) | ( ~ B & D)) + E + W[i] + 0x5A827999) & 0x0ffffffff;
+                    E = D;
+                    D = C;
+                    C = rotate_left(B, 30);
+                    B = A;
+                    A = temp;
+
+                }
+                for( i = 20; i <= 39; i ++ )
+                {
+                    temp = (rotate_left(A, 5) + (B ^ C ^ D) + E + W[i] + 0x6ED9EBA1) & 0x0ffffffff;
+                    E = D;
+                    D = C;
+                    C = rotate_left(B, 30);
+                    B = A;
+                    A = temp;
+
+                }
+                for( i = 40; i <= 59; i ++ )
+                {
+                    temp = (rotate_left(A, 5) + ((B & C) | (B & D) | (C & D)) + E + W[i] + 0x8F1BBCDC) & 0x0ffffffff;
+                    E = D;
+                    D = C;
+                    C = rotate_left(B, 30);
+                    B = A;
+                    A = temp;
+                }
+                for( i = 60; i <= 79; i ++ )
+                {
+                    temp = (rotate_left(A, 5) + (B ^ C ^ D) + E + W[i] + 0xCA62C1D6) & 0x0ffffffff;
+                    E = D;
+                    D = C;
+                    C = rotate_left(B, 30);
+                    B = A;
+                    A = temp;
+
+                }
+                H0 = (H0 + A) & 0x0ffffffff;
+                H1 = (H1 + B) & 0x0ffffffff;
+                H2 = (H2 + C) & 0x0ffffffff;
+                H3 = (H3 + D) & 0x0ffffffff;
+                H4 = (H4 + E) & 0x0ffffffff;
+
+            }
+            var temp = cvt_hex(H0) + cvt_hex(H1) + cvt_hex(H2) + cvt_hex(H3) + cvt_hex(H4);
+            return temp.toUpperCase();
+        }
+
+        function SHA1Bytes (msg)
+        {
+            var blockstart;
+            var i, j;
+            var W = new Array(80);
+            var H0 = 0x67452301;
+            var H1 = 0xEFCDAB89;
+            var H2 = 0x98BADCFE;
+            var H3 = 0x10325476;
+            var H4 = 0xC3D2E1F0;
+            var A, B, C, D, E;
+            var temp;
+            var msg_len = msg.length;
+            var word_array = new Array();
+            for( i = 0; i < msg_len - 3; i += 4 )
+            {
+                if (msg[i] > 255 || msg[i + 1] > 255 || msg[i + 2] > 255 || msg[i + 3] > 255) alert('Not a byte!');
+                j = msg[i] << 24 | msg[i + 1] << 16 | msg[i + 2] << 8 | msg[i + 3];
+                word_array.push( j );
+
+            }
+            switch( msg_len % 4 )
+            {
+                case 0 : i = 0x080000000;
+                    break;
+                case 1 : i = msg[msg_len - 1] << 24 | 0x0800000;
+                    break;
+                case 2 : i = msg[msg_len - 2] << 24 | msg[msg_len - 1] << 16 | 0x08000;
+                    break;
+                case 3 : i = msg[msg_len - 3] << 24 | msg[msg_len - 2] << 16 | msg[msg_len - 1] << 8    | 0x80;
+                    break;
+
+            }
+            word_array.push( i );
+            while( (word_array.length % 16) != 14 )
+                word_array.push( 0 );
+            word_array.push( msg_len >>> 29 );
+            word_array.push( (msg_len << 3) & 0x0ffffffff );
+            for ( blockstart = 0; blockstart < word_array.length; blockstart += 16 )
+            {
+                for( i = 0; i < 16; i ++ ) W[i] = word_array[blockstart + i];
+                for( i = 16; i <= 79; i ++ ) W[i] = rotate_left(W[i - 3] ^ W[i - 8] ^ W[i - 14] ^ W[i - 16], 1);
+                A = H0;
+                B = H1;
+                C = H2;
+                D = H3;
+                E = H4;
+                for( i = 0; i <= 19; i ++ )
+                {
+                    temp = (rotate_left(A, 5) + ((B & C) | ( ~ B & D)) + E + W[i] + 0x5A827999) & 0x0ffffffff;
+                    E = D;
+                    D = C;
+                    C = rotate_left(B, 30);
+                    B = A;
+                    A = temp;
+                }
+                for( i = 20; i <= 39; i ++ )
+                {
+                    temp = (rotate_left(A, 5) + (B ^ C ^ D) + E + W[i] + 0x6ED9EBA1) & 0x0ffffffff;
+                    E = D;
+                    D = C;
+                    C = rotate_left(B, 30);
+                    B = A;
+                    A = temp;
+
+                }
+                for( i = 40; i <= 59; i ++ )
+                {
+                    temp = (rotate_left(A, 5) + ((B & C) | (B & D) | (C & D)) + E + W[i] + 0x8F1BBCDC) & 0x0ffffffff;
+                    E = D;
+                    D = C;
+                    C = rotate_left(B, 30);
+                    B = A;
+                    A = temp;
+                }
+                for( i = 60; i <= 79; i ++ )
+                {
+                    temp = (rotate_left(A, 5) + (B ^ C ^ D) + E + W[i] + 0xCA62C1D6) & 0x0ffffffff;
+                    E = D;
+                    D = C;
+                    C = rotate_left(B, 30);
+                    B = A;
+                    A = temp;
+
+                }
+                H0 = (H0 + A) & 0x0ffffffff;
+                H1 = (H1 + B) & 0x0ffffffff;
+                H2 = (H2 + C) & 0x0ffffffff;
+                H3 = (H3 + D) & 0x0ffffffff;
+                H4 = (H4 + E) & 0x0ffffffff;
+
+            }
+            var temp = cvt_hex(H0) + cvt_hex(H1) + cvt_hex(H2) + cvt_hex(H3) + cvt_hex(H4);
+            return temp.toUpperCase();
+        }
+
+
+
+        function encode64Bytes(input)
+        {
+            var output = '';
+            var chr1, chr2, chr3;
+            var enc1, enc2, enc3, enc4;
+            var i = 0;
+            while (i < input.length)
+            {
+                chr1 = input[i ++ ];
+                chr2 = input[i ++ ];
+                chr3 = input[i ++ ];
+                enc1 = chr1 >> 2;
+                enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+                enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+                enc4 = chr3 & 63;
+                if (isNaN(chr2))
+                {
+                    enc3 = enc4 = 64;
+
+                }
+                else if (isNaN(chr3))
+                {
+                    enc4 = 64;
+
+                }
+                output = output + keyStr.charAt(enc1) + keyStr.charAt(enc2) + keyStr.charAt(enc3) + keyStr.charAt(enc4);
+
+            }
+            return output;
+        }
+        function decode64Bytes(input)
+        {
+            var output = [];
+            var chr1, chr2, chr3;
+            var enc1, enc2, enc3, enc4;
+            var i = 0;
+            // remove all characters that are not A - Z, a - z, 0 - 9, + , / , or =
+            input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+            while (i < input.length)
+            {
+                enc1 = keyStr.indexOf(input.charAt(i ++ ));
+                enc2 = keyStr.indexOf(input.charAt(i ++ ));
+                enc3 = keyStr.indexOf(input.charAt(i ++ ));
+                enc4 = keyStr.indexOf(input.charAt(i ++ ));
+                chr1 = (enc1 << 2) | (enc2 >> 4);
+                chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+                chr3 = ((enc3 & 3) << 6) | enc4;
+                output.push(chr1);
+                if (enc3 != 64)
+                {
+                    output.push(chr2);
+
+                }
+                if (enc4 != 64)
+                {
+                    output.push(chr3);
+
+                }
+            }
+            return output;
+        }
+        function parseHexaBytes(iText)
+        {
+            var aResult = [];
+            for (var i = 0; i < iText.length; i = i + 2)
+            {
+                var aValue = parseInt(iText.substr(i, 2), 16);
+                if (aValue > 255) alert('Too large!');
+                if (aValue == 0)
+                    alert('Null value!');
+                aResult.push(aValue);
+
+            }
+            return aResult;
+        }
+        function stringToArray(iText)
+        {
+            var aResult = [];
+            for (var i = 0; i < iText.length; i = i + 1)
+            {
+                aResult.push(iText.charCodeAt(i));
+
+            }
+            return aResult;
+        }
+        function WbsPassword(pwd, timestamp, nonceB64)
+        {
+            var aPwd = parseHexaBytes(SHA1(pwd));
+            alert(aPwd);
+            var aNonce = decode64Bytes(nonceB64);alert(aNonce);
+            var aTime = stringToArray(timestamp);alert(aTime)
+            var aHash = SHA1Bytes(aNonce.concat(aTime.concat(aPwd)));alert(aHash);
+            var HshPwd = encode64Bytes(parseHexaBytes(aHash));alert(HshPwd);
+
+            return HshPwd;
+        }
+
+
+        function urlDecode(str){
+            str=str.replace(new RegExp('\\+','g'),' ');
+            return unescape(str);
+        }
+        function urlEncode(str){
+            str=escape(str);
+            str=str.replace(new RegExp('\\+','g'),'%2B');
+            return str.replace(new RegExp('%20','g'),'+');
+        }
+
+        var END_OF_INPUT = -1;
+
+        var base64Chars = new Array(
+                'A','B','C','D','E','F','G','H',
+                'I','J','K','L','M','N','O','P',
+                'Q','R','S','T','U','V','W','X',
+                'Y','Z','a','b','c','d','e','f',
+                'g','h','i','j','k','l','m','n',
+                'o','p','q','r','s','t','u','v',
+                'w','x','y','z','0','1','2','3',
+                '4','5','6','7','8','9','+','/'
+        );
+
+        var reverseBase64Chars = new Array();
+        for (var i=0; i < base64Chars.length; i++){
+            reverseBase64Chars[base64Chars[i]] = i;
+        }
+
+        var base64Str;
+        var base64Count;
+        function setBase64Str(str){
+            base64Str = str;
+            base64Count = 0;
+        }
+        function readBase64(){
+            if (!base64Str) return END_OF_INPUT;
+            if (base64Count >= base64Str.length) return END_OF_INPUT;
+            var c = base64Str.charCodeAt(base64Count) & 0xff;
+            base64Count++;
+            return c;
+        }
+        function encodeBase64(str){
+            setBase64Str(str);
+            var result = '';
+            var inBuffer = new Array(3);
+            var lineCount = 0;
+            var done = false;
+            while (!done && (inBuffer[0] = readBase64()) != END_OF_INPUT){
+                inBuffer[1] = readBase64();
+                inBuffer[2] = readBase64();
+                result += (base64Chars[ inBuffer[0] >> 2 ]);
+                if (inBuffer[1] != END_OF_INPUT){
+                    result += (base64Chars [(( inBuffer[0] << 4 ) & 0x30) | (inBuffer[1] >> 4) ]);
+                    if (inBuffer[2] != END_OF_INPUT){
+                        result += (base64Chars [((inBuffer[1] << 2) & 0x3c) | (inBuffer[2] >> 6) ]);
+                        result += (base64Chars [inBuffer[2] & 0x3F]);
+                    } else {
+                        result += (base64Chars [((inBuffer[1] << 2) & 0x3c)]);
+                        result += ('=');
+                        done = true;
+                    }
+                } else {
+                    result += (base64Chars [(( inBuffer[0] << 4 ) & 0x30)]);
+                    result += ('=');
+                    result += ('=');
+                    done = true;
+                }
+                lineCount += 4;
+                if (lineCount >= 76){
+                    result += ('\n');
+                    lineCount = 0;
+                }
+            }
+            return result;
+        }
+        function readReverseBase64(){
+            if (!base64Str) return END_OF_INPUT;
+            while (true){
+                if (base64Count >= base64Str.length) return END_OF_INPUT;
+                var nextCharacter = base64Str.charAt(base64Count);
+                base64Count++;
+                if (reverseBase64Chars[nextCharacter]){
+                    return reverseBase64Chars[nextCharacter];
+                }
+                if (nextCharacter == 'A') return 0;
+            }
+            return END_OF_INPUT;
+        }
+
+        function ntos(n){
+            n=n.toString(16);
+            if (n.length == 1) n="0"+n;
+            n="%"+n;
+            return unescape(n);
+        }
+
+        function decodeBase64(str){
+            setBase64Str(str);
+            var result = "";
+            var inBuffer = new Array(4);
+            var done = false;
+            while (!done && (inBuffer[0] = readReverseBase64()) != END_OF_INPUT
+            && (inBuffer[1] = readReverseBase64()) != END_OF_INPUT){
+                inBuffer[2] = readReverseBase64();
+                inBuffer[3] = readReverseBase64();
+                result += ntos((((inBuffer[0] << 2) & 0xff)| inBuffer[1] >> 4));
+                if (inBuffer[2] != END_OF_INPUT){
+                    result +=  ntos((((inBuffer[1] << 4) & 0xff)| inBuffer[2] >> 2));
+                    if (inBuffer[3] != END_OF_INPUT){
+                        result +=  ntos((((inBuffer[2] << 6)  & 0xff) | inBuffer[3]));
+                    } else {
+                        done = true;
+                    }
+                } else {
+                    done = true;
+                }
+            }
+            return result;
+        }
+
+        var digitArray = new Array('0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f');
+        function toHex(n){
+            var result = ''
+            var start = true;
+            for (var i=32; i>0;){
+                i-=4;
+                var digit = (n>>i) & 0xf;
+                if (!start || digit != 0){
+                    start = false;
+                    result += digitArray[digit];
+                }
+            }
+            return (result==''?'0':result);
+        }
+
+        function pad(str, len, pad){
+            var result = str;
+            for (var i=str.length; i<len; i++){
+                result = pad + result;
+            }
+            return result;
+        }
+
+        function encodeHex(str){
+            var result = "";
+            for (var i=0; i<str.length; i++){
+                result += pad(toHex(str.charCodeAt(i)&0xff),2,'0');
+            }
+            return result;
+        }
+
+        var hexv = {
+            "00":0,"01":1,"02":2,"03":3,"04":4,"05":5,"06":6,"07":7,"08":8,"09":9,"0A":10,"0B":11,"0C":12,"0D":13,"0E":14,"0F":15,
+            "10":16,"11":17,"12":18,"13":19,"14":20,"15":21,"16":22,"17":23,"18":24,"19":25,"1A":26,"1B":27,"1C":28,"1D":29,"1E":30,"1F":31,
+            "20":32,"21":33,"22":34,"23":35,"24":36,"25":37,"26":38,"27":39,"28":40,"29":41,"2A":42,"2B":43,"2C":44,"2D":45,"2E":46,"2F":47,
+            "30":48,"31":49,"32":50,"33":51,"34":52,"35":53,"36":54,"37":55,"38":56,"39":57,"3A":58,"3B":59,"3C":60,"3D":61,"3E":62,"3F":63,
+            "40":64,"41":65,"42":66,"43":67,"44":68,"45":69,"46":70,"47":71,"48":72,"49":73,"4A":74,"4B":75,"4C":76,"4D":77,"4E":78,"4F":79,
+            "50":80,"51":81,"52":82,"53":83,"54":84,"55":85,"56":86,"57":87,"58":88,"59":89,"5A":90,"5B":91,"5C":92,"5D":93,"5E":94,"5F":95,
+            "60":96,"61":97,"62":98,"63":99,"64":100,"65":101,"66":102,"67":103,"68":104,"69":105,"6A":106,"6B":107,"6C":108,"6D":109,"6E":110,"6F":111,
+            "70":112,"71":113,"72":114,"73":115,"74":116,"75":117,"76":118,"77":119,"78":120,"79":121,"7A":122,"7B":123,"7C":124,"7D":125,"7E":126,"7F":127,
+            "80":128,"81":129,"82":130,"83":131,"84":132,"85":133,"86":134,"87":135,"88":136,"89":137,"8A":138,"8B":139,"8C":140,"8D":141,"8E":142,"8F":143,
+            "90":144,"91":145,"92":146,"93":147,"94":148,"95":149,"96":150,"97":151,"98":152,"99":153,"9A":154,"9B":155,"9C":156,"9D":157,"9E":158,"9F":159,
+            "A0":160,"A1":161,"A2":162,"A3":163,"A4":164,"A5":165,"A6":166,"A7":167,"A8":168,"A9":169,"AA":170,"AB":171,"AC":172,"AD":173,"AE":174,"AF":175,
+            "B0":176,"B1":177,"B2":178,"B3":179,"B4":180,"B5":181,"B6":182,"B7":183,"B8":184,"B9":185,"BA":186,"BB":187,"BC":188,"BD":189,"BE":190,"BF":191,
+            "C0":192,"C1":193,"C2":194,"C3":195,"C4":196,"C5":197,"C6":198,"C7":199,"C8":200,"C9":201,"CA":202,"CB":203,"CC":204,"CD":205,"CE":206,"CF":207,
+            "D0":208,"D1":209,"D2":210,"D3":211,"D4":212,"D5":213,"D6":214,"D7":215,"D8":216,"D9":217,"DA":218,"DB":219,"DC":220,"DD":221,"DE":222,"DF":223,
+            "E0":224,"E1":225,"E2":226,"E3":227,"E4":228,"E5":229,"E6":230,"E7":231,"E8":232,"E9":233,"EA":234,"EB":235,"EC":236,"ED":237,"EE":238,"EF":239,
+            "F0":240,"F1":241,"F2":242,"F3":243,"F4":244,"F5":245,"F6":246,"F7":247,"F8":248,"F9":249,"FA":250,"FB":251,"FC":252,"FD":253,"FE":254,"FF":255
+        };
+
+        function decodeHex(str){
+            str = str.toUpperCase().replace(new RegExp("s/[^0-9A-Z]//g"));
+            var result = "";
+            var nextchar = "";
+            for (var i=0; i<str.length; i++){
+                nextchar += str.charAt(i);
+                if (nextchar.length == 2){
+                    result += ntos(hexv[nextchar]);
+                    nextchar = "";
+                }
+            }
+            return result;
+
+        }
+
+        function Complete(obj, evt) {
+            if ((!obj) || (!evt) || (aMail.length == 0)) {
+                return;
+            }
+
+            if (obj.value.length == 0) {
+                return;
+            }
+
+            var elm = (obj.setSelectionRange) ? evt.which : evt.keyCode;
+
+            if ((elm < 32) || (elm >= 33 && elm <= 46) || (elm >= 112 && elm <= 123)) {
+                return;
+            }
+
+            var txt = obj.value.replace(/;/gi, ",");
+            elm = txt.split(",");
+            txt = elm.pop();
+            txt = txt.replace(/^\s*/, "");
+
+            if (txt.length == 0) {
+                return;
+            }
+
+            if (obj.createTextRange) {
+                var rng = document.selection.createRange();
+                if (rng.parentElement() == obj) {
+                    elm = rng.text;
+                    var ini = obj.value.lastIndexOf(elm);
+                }
+            } else if (obj.setSelectionRange) {
+                var ini = obj.selectionStart;
+            }
+
+            for (var i = 0; i < aMail.length; i++) {
+                elm = aMail[i].toString();
+
+                if (elm.toLowerCase().indexOf(txt.toLowerCase()) == 0) {
+                    obj.value += elm.substring(txt.length, elm.length);
+                    break;
+                }
+            }
+
+            if (obj.createTextRange) {
+                rng = obj.createTextRange();
+                rng.moveStart("character", ini);
+                rng.moveEnd("character", obj.value.length);
+                rng.select();
+            } else if (obj.setSelectionRange) {
+                obj.setSelectionRange(ini, obj.value.length);
+            }
+        }
+
+
+        function pasteSes(){
+            ct = window.clipboardData.getData('Text');
+            ct = strim(ct);
+
+            sign = new Array();
+            c=0;
+
+            ses="";
+            seq="";
+            token="";
+
+            if(ct.substring(0,1)!="<"){alert("The format is not correct"); return;}
+            for(i=0;i<ct.length;i++){
+                s=ct.substring(i,i+1);
+                if(s=="<" || s==">"){sign[c]=i; c++;}
+            }
+
+            if(sign.length!=16){alert("The format is not correct"); return;}
+
+            ses=ct.substring(sign[3]+1,sign[4]);
+            seq=ct.substring(sign[7]+1,sign[8]); seq=parseInt(seq);
+            token=ct.substring(sign[11]+1,sign[12]);
+
+            document.getElementById('ises').value=ses;
+            document.getElementById('iseq').value=seq+1;
+            document.getElementById('itoken').value=token;
+
+        }
+
+
+    </SCRIPT>
+
+
+</HEAD>
+
+<BODY onLoad="init()">
+
+<a href="" id="ilogs" onClick="viewLog()">View Logs</a>
+
+<form name="f1">
+
+    <table>
+        <tr>
+            <td>
+                <script>
+                    //document.write("eeeeeeee");
+                    //writePage();
+                </script>
+            </td>
+        </tr>
+    </table>
+
+
+
+    <table>
+        <tr>
+            <td>
+                <table border="1">
+                    <tr>
+                        <td align="right">Stateless :</td>
+                        <td><input type="radio" name="group1" id="isl" value="stateless" onClick="slDo()" checked></td>
+                    </tr>
+                    <tr>
+                        <td align="right">Stateful :</td>
+                        <td><input type="radio" name="group1" id="isf" value="stateful" onClick="sfDo()"></td>
+                    </tr>
+                </table>
+            </td>
+
+
+            <td>
+                <table border="1" id="t1">
+                    <tr>
+                        <td>TransactionStatusCode :</td>
+                        <td>
+                            <select name="itsc" id="itsc" onclick="itscChanged()" disabled>
+                                <option value="Start">Start</option>
+                                <option value="InSeries">InSeries</option>
+                                <option value="End">End</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+
+
+            <td>
+                <table>
+                    <tr>
+                        <td>
+                            <table border="1" id="t2">
+                                <tr>
+                                    <td align="left" colspan="2">
+                                        <table>
+                                            <tr>
+                                                <td><h3>Session</h3></td>
+                                                <td><input type="button" value="V-V-V-V Paste V-V-V-V" onClick="pasteSes()"></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="right"><font color="red"><b>*</b></font>SessionID :</td>
+                                    <td><input type="text" name="ises" id="ises" value="" disabled></td>
+                                </tr>
+                                <tr>
+                                    <td align="right"><font color="red"><b>*</b></font>Sequence :</td>
+                                    <td><input type="text" name="iseq" id="iseq" value="" disabled></td>
+                                </tr>
+                                <tr>
+                                    <td align="right"><font color="red"><b>*</b></font>SecurityToken :</td>
+                                    <td><input type="text" name="itoken" id="itoken" value="" disabled></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td>
+                            <table border="0">
+                                <tr><td>
+                                    <input type="button" id="inext" value="Next Stateful transaction -->" onClick="next()">
+                                </td></tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <table>
+        <tr>
+            <td>
+                <table border="1">
+                    <tr>
+                        <td align="left" colspan="2"><h3>1A-Security</h3></td>
+                    </tr>
+                    <tr>
+                        <td align="right"><font color="red"><b>*</b></font>Office ID :</td>
+                        <td align="left">
+                            <input type="text" name="ioid" id="ioid" value="">
+                        </td>
+                    </tr>
+                </table>
+            </td>
+
+            <td>
+                <table border="1">
+                    <tr>
+                        <td align="left" colspan="2"><h3>WS-Addressing</h3></td>
+                    </tr>
+                    <tr>
+                        <td align="right">message ID :</td>
+                        <td align="left">
+                            <input type="text" name="imid" id="imid" value="" size="50">
+                            <input type="button" value="Generate Message ID" onClick="getMid()">
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td align="right">action :</td>
+                        <td align="left">
+                            <input type="text" name="iaction" id="iaction" value="" size="70">
+                            <script>
+
+                                /*
+
+                                 document.write("<select name=\"iservice\" id=\"iservice\" onclick=\"actionChanged()\">");
+
+                                 file2array();
+
+                                 len = sitems.length; //alert(len);
+
+                                 for(i=0;i<len;i++){
+
+                                 sname = getServiceName(sitems[i])+" "+getServiceVersion(sitems[i])+"."+getServiceRelease(sitems[i]);
+                                 svalue = getServiceCode(sitems[i]);
+
+                                 document.write("<option value=\""+svalue+"\">"+sname+"</option>");
+                                 }
+
+                                 document.write("</select>");
+
+                                 */
+
+                            </script>
+
+                            <select name="iservice" id="iservice" onclick="actionChanged()">
+                                <option value="ITAREQ_05_2_IA">Air_SellFromRecommendation 5.2</option>
+                                <option value="HSFREQ_07_3_1A">Command_Cryptic 7.3</option>
+                                <option value="TTKTIQ_12_1_1A">DocIssuance_IssueTicket 12.1</option>
+                                <option value="TIPNRQ_13_2_1A">Fare_InformativePricingWithoutPNR 13.2</option>
+                                <option value="FMPTBQ_12_4_1A">Fare_MasterPricerTravelBoardSearch 12.4</option>
+                                <option value="TPCBRQ_13_2_1A">Fare_PricePNRWithBookingClass 13.2</option>
+                                <option value="TMRCRQ_11_1_1A">MiniRule_GetFromPricing 11.1</option>
+                                <option value="PNRADD_13_1_1A">PNR_AddMultiElements 13.1</option>
+                                <option value="PNRXCL_13_1_1A">PNR_Cancel 13.1</option>
+                                <option value="PNRRET_13_1_1A">PNR_Retrieve 13.1</option>
+                                <option value="QDQLRQ_11_1_1A">Queue_List 11.1</option>
+                                <option value="QUQPCQ_03_1_1A">Queue_PlacePNR 3.1</option>
+                                <option value="QUQMDQ_03_1_1A">Queue_RemoveItem 3.1</option>
+                                <option value="VLSSOQ_04_1_1A">Security_SignOut 4.1</option>
+                                <option value="TAUTCQ_04_1_1A">Ticket_CreateTSTFromPricing 4.1</option>
+                            </select>
+
+
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <table border="1">
+        <tr>
+            <td align="left" colspan="2"><h3>WS-Security</h3></td>
+        </tr>
+        <tr>
+            <td align="right"><font color="red"><b>*</b></font>WS User :</td>
+            <td align="left">
+                <input type="text" name="iuser" id="iuser" value="" onBlur="getComAppCode()" onKeyUp="Complete(this, event)">
+
+                <!--<input type="text" name="iuser" id="iuser" value="" onblur="getComAppCode()">-->
+
+
+                Company Code :<input type="text" name="icom" id="icom" value="" size="3">
+                Application Code :<input type="text" name="iapp" id="iapp" value="" size="3">
+            </td>
+        </tr>
+        <tr>
+            <td align="right"><font color="red"><b>*</b></font>password :</td>
+            <td align="left"><input type="text" name="ipasswd" id="ipasswd" value=""></td>
+        </tr>
+        <tr>
+            <td align="right">nonce :</td>
+            <td align="left">
+                <input type="text" name="inonce" id="inonce" value="">
+                <input type="button" id="bnonce" value="Generate Nonce" onClick="getNonce()">
+            </td>
+        </tr>
+        <tr>
+            <td align="right">timestamp :</td>
+            <td align="left">
+                <input type="text" name="itimestamp" id="itimestamp" value="" size="40">
+                <input type="button" id="btimestamp" value="Current Time" onClick="getT()">
+            </td>
+        </tr>
+        <tr>
+            <td align="right"><font color="blue">Password Digest :</font></td>
+            <td align="left">
+                <input type="text" name="ireply" id="ireply" size=50 DISABLED>
+                <input type="button" id="breply" value="        Encrypt         " onClick="submitEncrypt()"></td>
+        </tr>
+        <tr>
+            <td> </td>
+            <td align="left"></td>
+        </tr>
+    </table>
+
+    <br>
+
+
+    <table border="1">
+        <tr>
+            <td align="left">
+                <input type="button" value="Generate SOAP Header" onClick="getHeader()">
+                <input type="button" value="Copy to Clipboard" onClick="copy()">
+            </td>
+        </tr>
+        <tr>
+            <td align="left">
+<textarea rows="25" cols="150" name="ihd" id="ihd">
+&#13;
+</textarea>
+            </td>
+            </td>
+        </tr>
+    </table>
+
+    <br><br>
+
+</form>
+
+</BODY>
+</HTML>
