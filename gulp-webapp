@@ -1,0 +1,19 @@
+Gulp-webapp项目
+1、安装python和git，如果安装确认环境变量中已经配置
+# install dependencies
+2、npm install -g gulp bower yo
+3、npm install -g generator-gulp-webapp
+4、npm install -g generator-webapp   #这个使用grunt构建，暂时忽略
+# create an empty directory for your project
+5、mkdir gulp-webapp
+6、cd gulp-webapp
+# scaffold
+7、yo gulp-webapp
+# connect to localhost,
+# open your default browser,
+# and watch for changes
+8、gulp serve
+# build for production
+9、gulp build
+
+[NOTE]:如果出现permission问题，可以尝试执行npm cache clean，再执行命令
